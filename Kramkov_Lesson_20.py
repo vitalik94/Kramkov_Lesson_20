@@ -7,43 +7,38 @@
 # добавляет в нее несколько задач и позволяет пользователю получать информацию о задачах.
 
 import sqlite3
+with sqlite3.connect('tasks_data.db') as conn:
 
-conn = sqlite3.connect('tasks_data.db')
+    cursor = conn.cursor()
 
-cursor = conn.cursor()
+    cursor.execute('''CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT,
+    status TEXT)''')
 
-cursor.execute('''CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT,
-status TEXT)''')
+    list_tasks = [('ознакомление', 'ознакомление с задачей, планировка, анализ', 'выполнено'),
+    ('дизайн', 'проектирование интерфейса и структуры', 'выполнено'),
+    ('декомпозиция', 'разбиение задачи на подзадачи', 'выполнено'),
+    ('разработка', 'разработка и написание кода', 'выполнено'),
+    ('тестирование', 'проверка задачи на ошибки', 'невыполнено'),
+    ('релиз', 'релиз задачи', 'невыполнено'),
+    ('мониторинг', 'оценка проделанной работы', 'невыполнено')]
 
-cursor.execute('''INSERT INTO tasks(name, description, status) VALUES
-('ознакомление', 'ознакомление с задачей, планировка, анализ', 'выполнено'),
-('дизайн', 'проектирование интерфейса и структуры', 'выполнено'),
-('декомпозиция', 'разбиение задачи на подзадачи', 'выполнено'),
-('разработка', 'разработка и написание кода', 'выполнено'),
-('тестирование', 'проверка задачи на ошибки', 'невыполнено')''')
+    cursor.executemany('''INSERT INTO tasks(name, description, status) VALUES(?,?,?)''', list_tasks)
+    conn.commit()
 
-conn.commit()
+    cursor.execute('''SELECT * FROM tasks''')
+    k = cursor.fetchall()
+    print(k)
 
-cursor.execute('''INSERT INTO tasks(name, description, status) VALUES
-('релиз', 'релиз задачи', 'невыполнено'),
-('мониторинг', 'оценка проделанной работы', 'невыполнено')''')
+    cursor.execute('''SELECT * FROM tasks WHERE status='выполнено' ''')
+    k = cursor.fetchall()
+    print(k)
 
-conn.commit()
+    cursor.execute('''SELECT * FROM tasks WHERE status='невыполнено' ''')
+    k = cursor.fetchall()
+    print(k)
 
-cursor.execute('''SELECT * FROM tasks''')
-k = cursor.fetchall()
-print(k)
+    cursor.execute('''SELECT name, status FROM tasks''')
+    k = cursor.fetchall()
+    print(k)
 
-cursor.execute('''SELECT * FROM tasks WHERE status='выполнено' ''')
-k = cursor.fetchall()
-print(k)
 
-cursor.execute('''SELECT * FROM tasks WHERE status='невыполнено' ''')
-k = cursor.fetchall()
-print(k)
-
-cursor.execute('''SELECT name, status FROM tasks''')
-k = cursor.fetchall()
-print(k)
-
-conn.close()
